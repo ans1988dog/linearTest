@@ -86,7 +86,57 @@
       .mode-button { display: flex; }
       .game-note { font-size: 10px; }
     }
-    @media (max-width: 380px) { .segments button { padding: 0 8px; } .rules { grid-template-columns: 1fr; } }
+    @media (max-width: 380px) { .segments button { padding: 0 8px; } .rules { grid-template-columns: 1fr; } .on-air { display: none; } }
+
+    /* LIN-2: a high-contrast broadcast-console skin for the game surface. */
+    :root {
+      color-scheme: dark;
+      --ink: #e9f4ff;
+      --muted: #8ba5bb;
+      --paper: #07111f;
+      --surface: #0d1b2d;
+      --line: #1e3a52;
+      --green: #50e3ff;
+      --green-soft: #12364e;
+      --red: #ff6f91;
+      --tile: #132c43;
+      --tile-shadow: #21435d;
+    }
+    body {
+      background-color: var(--paper);
+      background-image: linear-gradient(#123047 1px, transparent 1px), linear-gradient(90deg, #123047 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: rgba(7, 17, 31, .82); }
+    .shell { position: relative; }
+    .topline { border-color: var(--line); }
+    .brand { color: var(--ink); letter-spacing: 1px; }
+    .brand-mark { border: 1px solid var(--green); background: transparent; color: var(--green); box-shadow: 0 0 18px #50e3ff44; }
+    .on-air { color: var(--muted); letter-spacing: 1px; }
+    .on-air i { background: var(--red); box-shadow: 0 0 0 4px #ff6f9133, 0 0 12px var(--red); }
+    .eyebrow { color: var(--green); letter-spacing: 2px; }
+    .subtitle, .rules li, .counter span { color: var(--muted); }
+    .segments { border-color: var(--line); background: #091727; }
+    .segments button[aria-pressed="true"] { background: var(--green); color: #051522; box-shadow: 0 0 16px #50e3ff44; }
+    .icon-button, .scorebar, .face, .mode-button, .key { border-color: var(--line); background: var(--surface); }
+    .icon-button:hover, .icon-button:focus-visible, .face:hover { border-color: var(--green); color: var(--green); background: #153a54; }
+    .scorebar { border-bottom: 0; }
+    .counter strong { color: #b5f36b; font-family: Consolas, monospace; text-shadow: 0 0 12px #b5f36b55; }
+    .board-frame { border-color: var(--line); background: #091727; box-shadow: 0 18px 45px #00000033; }
+    .cell { border: 1px solid #21435d; border-radius: 3px; background: var(--tile); box-shadow: none; transition: background .12s, border-color .12s, transform .12s; }
+    .cell:hover:not(.revealed) { border-color: var(--green); background: #1b415d; transform: translateY(-1px); }
+    .cell.revealed { border-color: #173349; background: #0d2033; box-shadow: none; }
+    .cell.flagged { color: var(--red); text-shadow: 0 0 10px #ff6f91aa; }
+    .cell.mine-hit { border-color: var(--red); background: #4a1d35; }
+    .cell[data-n="1"] { color: #55c7ff; } .cell[data-n="2"] { color: #b5f36b; }
+    .cell[data-n="3"] { color: #ff8b79; } .cell[data-n="4"] { color: #bf9cff; }
+    .cell[data-n="5"] { color: #ffba72; } .cell[data-n="6"] { color: #66e5d1; }
+    .game-note span:last-child, .side-title { color: var(--green); }
+    .rule-number { color: #b5f36b; font-family: Consolas, monospace; }
+    .key { color: var(--green); }
+    .mode-button.active { border-color: var(--green); background: #12364e; color: var(--green); }
+    .result { color: #b5f36b; }
+    footer { border-color: var(--line); color: #5d7890; letter-spacing: 1px; }
   </style>
 </head>
 <body>
