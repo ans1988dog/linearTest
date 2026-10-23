@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f5f2">
+  <title>扫雷现场 | 游戏节目</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #202522;
+      --muted: #747b76;
+      --paper: #f4f5f2;
+      --surface: #fff;
+      --line: #dfe3dd;
+      --green: #256d50;
+      --green-soft: #e6f1e9;
+      --red: #c74a3b;
+      --tile: #e5e9e3;
+      --tile-shadow: #c7cec6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    button { font: inherit; color: inherit; }
+    .shell { width: min(100% - 40px, 1060px); margin: 0 auto; padding: 32px 0 48px; }
+    .topline { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; }
+    .brand-mark { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 8px; background: var(--green); color: white; font-size: 17px; }
+    .on-air { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+    .on-air i { width: 7px; height: 7px; border-radius: 50%; background: #cb5346; box-shadow: 0 0 0 3px #f7e5e2; }
+    main { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 50px; align-items: start; padding-top: 34px; }
+    .eyebrow { margin: 0 0 8px; color: var(--green); font-size: 12px; font-weight: 700; }
+    h1 { margin: 0; font-size: clamp(28px, 5vw, 38px); line-height: 1.2; }
+    .subtitle { margin: 9px 0 24px; color: var(--muted); font-size: 14px; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+    .segments { display: flex; gap: 3px; padding: 3px; border: 1px solid var(--line); border-radius: 7px; background: #ecefea; }
+    .segments button { min-height: 32px; padding: 0 12px; border: 0; border-radius: 5px; background: transparent; color: var(--muted); cursor: pointer; font-size: 12px; }
+    .segments button[aria-pressed="true"] { background: white; color: var(--ink); box-shadow: 0 1px 2px #20252212; font-weight: 700; }
+    .icon-button { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); cursor: pointer; }
+    .icon-button:hover, .icon-button:focus-visible { border-color: var(--green); color: var(--green); }
+    .icon-button svg { width: 18px; height: 18px; }
+    .scorebar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; min-height: 62px; padding: 0 16px; border: 1px solid var(--line); border-radius: 8px 8px 0 0; background: #fff; }
+    .counter { display: flex; align-items: baseline; gap: 7px; }
+    .counter:last-child { justify-content: end; }
+    .counter strong { font-variant-numeric: tabular-nums; font-size: 21px; }
+    .counter span { color: var(--muted); font-size: 11px; }
+    .face { display: grid; width: 38px; height: 38px; place-items: center; border: 0; border-radius: 50%; background: #f2f4ef; cursor: pointer; font-size: 21px; }
+    .face:hover { background: var(--green-soft); }
+    .board-frame { padding: 10px; overflow: auto; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 8px 8px; background: #edf0eb; }
+    .board { display: grid; width: max-content; margin: 0 auto; gap: 3px; user-select: none; touch-action: manipulation; }
+    .cell { display: grid; width: 36px; aspect-ratio: 1; place-items: center; padding: 0; border: 0; border-radius: 4px; background: var(--tile); box-shadow: inset 0 -2px var(--tile-shadow), inset 0 1px #fff; cursor: pointer; font-size: 16px; font-weight: 800; }
+    .cell:hover:not(.revealed) { background: #d8e2d8; }
+    .cell:focus-visible { outline: 2px solid var(--green); outline-offset: 1px; z-index: 1; }
+    .cell.revealed { background: #fff; box-shadow: inset 0 0 0 1px #e4e8e2; cursor: default; }
+    .cell.flagged { color: var(--red); }
+    .cell.mine-hit { background: #f1d8d3; }
+    .cell[data-n="1"] { color: #2875bd; } .cell[data-n="2"] { color: #32814f; }
+    .cell[data-n="3"] { color: #cc4d42; } .cell[data-n="4"] { color: #514b9a; }
+    .cell[data-n="5"] { color: #974c37; } .cell[data-n="6"] { color: #2d9292; }
+    .game-note { display: flex; justify-content: space-between; gap: 12px; padding: 11px 2px 0; color: var(--muted); font-size: 11px; }
+    .game-note span:last-child { text-align: right; }
+    aside { padding-top: 2px; }
+    .side-title { margin: 0 0 13px; font-size: 14px; }
+    .rules { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+    .rules li { display: grid; grid-template-columns: 24px 1fr; gap: 10px; padding: 13px 0; border-bottom: 1px solid var(--line); color: #535b55; font-size: 12px; line-height: 1.55; }
+    .rule-number { color: var(--green); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .key { display: inline-block; min-width: 22px; padding: 1px 5px; border: 1px solid #d8ddd7; border-radius: 4px; background: #fff; color: #4f5751; text-align: center; font-size: 10px; }
+    .mode-button { display: none; width: 100%; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; padding: 10px; border: 1px solid var(--line); border-radius: 7px; background: white; cursor: pointer; font-size: 12px; }
+    .mode-button.active { border-color: var(--green); background: var(--green-soft); color: var(--green); }
+    .result { min-height: 20px; margin-top: 9px; color: var(--green); font-size: 12px; font-weight: 700; text-align: center; }
+    footer { margin-top: 40px; padding-top: 14px; border-top: 1px solid var(--line); color: #89908a; font-size: 11px; }
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 28px, 560px); padding-top: 18px; }
+      main { grid-template-columns: 1fr; gap: 26px; padding-top: 26px; }
+      aside { padding-top: 0; }
+      .rules { display: grid; grid-template-columns: 1fr 1fr; column-gap: 18px; }
+      .rules li { align-items: start; }
+      .cell { width: min(8.6vw, 36px); }
+      .board-frame { padding: 8px 4px; }
+      .mode-button { display: flex; }
+      .game-note { font-size: 10px; }
+    }
+    @media (max-width: 380px) { .segments button { padding: 0 8px; } .rules { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topline">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">✳</span><span>今晚玩什么</span></div>
+      <div class="on-air"><i aria-hidden="true"></i>游戏节目 · 第 01 期</div>
+    </header>
+    <main>
+      <section aria-labelledby="title">
+        <p class="eyebrow">MINESWEEPER / 扫雷现场</p>
+        <h1 id="title">避开地雷，清空棋盘</h1>
+        <p class="subtitle">每一格都藏着线索。保持冷静，找到所有安全区域。</p>
+        <div class="toolbar">
+          <div class="segments" role="group" aria-label="选择难度">
+            <button type="button" data-level="easy" aria-pressed="true">初级</button>
+            <button type="button" data-level="medium" aria-pressed="false">中级</button>
+            <button type="button" data-level="hard" aria-pressed="false">高级</button>
+          </div>
+          <button class="icon-button" id="restart" type="button" aria-label="重新开始" title="重新开始">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M19 12a7.5 7.5 0 1 1-2.2-5.3L20 12"/></svg>
+          </button>
+        </div>
+        <div class="scorebar" aria-label="游戏状态">
+          <div class="counter"><strong id="mine-count">010</strong><span>剩余标记</span></div>
+          <button class="face" id="face" type="button" aria-label="重新开始" title="重新开始">🙂</button>
+          <div class="counter"><strong id="timer">000</strong><span>计时</span></div>
+        </div>
+        <div class="board-frame"><div class="board" id="board" role="grid" aria-label="扫雷棋盘"></div></div>
+        <button class="mode-button" id="mode" type="button" aria-pressed="false"><span aria-hidden="true">⚑</span><span>切换为插旗模式</span></button>
+        <div class="result" id="result" aria-live="polite"></div>
+        <div class="game-note"><span>左键翻开 · 右键插旗</span><span>第一次点击不会踩雷</span></div>
+      </section>
+      <aside aria-label="游戏规则">
+        <h2 class="side-title">节目规则</h2>
+        <ol class="rules">
+          <li><span class="rule-number">01</span><span>翻开方格，数字代表周围 8 格中的地雷数。</span></li>
+          <li><span class="rule-number">02</span><span>右键标记地雷；手机上可切换插旗模式。</span></li>
+          <li><span class="rule-number">03</span><span>找出所有安全格即可通关，不必标完地雷。</span></li>
+          <li><span class="rule-number">04</span><span>按 <span class="key">R</span> 随时重新开始，首击有保护。</span></li>
+        </ol>
+      </aside>
+    </main>
+    <footer>今晚玩什么 · 轻松一局，认真推理</footer>
+  </div>
+  <script>
+    (() => {
+      const levels = {
+        easy: { rows: 9, cols: 9, mines: 10 },
+        medium: { rows: 12, cols: 12, mines: 24 },
+        hard: { rows: 16, cols: 16, mines: 50 }
+      };
+      const boardEl = document.querySelector('#board');
+      const mineCountEl = document.querySelector('#mine-count');
+      const timerEl = document.querySelector('#timer');
+      const resultEl = document.querySelector('#result');
+      const faceEl = document.querySelector('#face');
+      const modeEl = document.querySelector('#mode');
+      let level = 'easy';
+      let cells = [];
+      let started = false;
+      let ended = false;
+      let flagMode = false;
+      let seconds = 0;
+      let timerId = null;
+
+      function reset() {
+        clearInterval(timerId);
+        const { rows, cols, mines } = levels[level];
+        cells = Array.from({ length: rows * cols }, (_, index) => ({
+          row: Math.floor(index / cols), col: index % cols, mine: false, count: 0, revealed: false, flagged: false
+        }));
+        started = false;
+        ended = false;
+        flagMode = false;
+        seconds = 0;
+        timerEl.textContent = '000';
+        mineCountEl.textContent = String(mines).padStart(3, '0');
+        resultEl.textContent = '';
+        faceEl.textContent = '🙂';
+        modeEl.classList.remove('active');
+        modeEl.setAttribute('aria-pressed', 'false');
+        modeEl.lastElementChild.textContent = '切换为插旗模式';
+        draw();
+      }
+
+      function draw() {
+        const { rows, cols } = levels[level];
+        boardEl.replaceChildren();
+        boardEl.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+        boardEl.setAttribute('aria-rowcount', rows);
+        boardEl.setAttribute('aria-colcount', cols);
+        cells.forEach((cell, index) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'cell';
+          button.setAttribute('role', 'gridcell');
+          button.setAttribute('aria-label', `第 ${cell.row + 1} 行第 ${cell.col + 1} 列${cell.revealed ? (cell.mine ? '，地雷' : cell.count ? `，周围 ${cell.count} 个地雷` : '，空白') : cell.flagged ? '，已标记' : '，未翻开'}`);
+          if (cell.flagged) { button.classList.add('flagged'); button.textContent = '⚑'; }
+          if (cell.revealed) {
+            button.classList.add('revealed');
+            if (cell.mine) { button.textContent = '✹'; if (cell.hit) button.classList.add('mine-hit'); }
+            else if (cell.count) { button.textContent = cell.count; button.dataset.n = cell.count; }
+          }
+          button.addEventListener('click', () => flagMode ? toggleFlag(index) : reveal(index));
+          button.addEventListener('contextmenu', event => { event.preventDefault(); toggleFlag(index); });
+          boardEl.append(button);
+        });
+      }
+
+      function neighbors(index) {
+        const { rows, cols } = levels[level];
+        const { row, col } = cells[index];
+        const found = [];
+        for (let r = Math.max(0, row - 1); r <= Math.min(rows - 1, row + 1); r++) {
+          for (let c = Math.max(0, col - 1); c <= Math.min(cols - 1, col + 1); c++) {
+            const next = r * cols + c;
+            if (next !== index) found.push(next);
+          }
+        }
+        return found;
+      }
+
+      function placeMines(firstIndex) {
+        const { mines } = levels[level];
+        const safe = new Set([firstIndex, ...neighbors(firstIndex)]);
+        const available = cells.map((_, index) => index).filter(index => !safe.has(index));
+        for (let i = available.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [available[i], available[j]] = [available[j], available[i]];
+        }
+        available.slice(0, mines).forEach(index => { cells[index].mine = true; });
+        cells.forEach((cell, index) => { cell.count = neighbors(index).filter(next => cells[next].mine).length; });
+      }
+
+      function startClock() {
+        if (started) return;
+        started = true;
+        timerId = setInterval(() => {
+          seconds = Math.min(999, seconds + 1);
+          timerEl.textContent = String(seconds).padStart(3, '0');
+        }, 1000);
+      }
+
+      function reveal(index) {
+        if (ended || cells[index].flagged || cells[index].revealed) return;
+        if (!started) { placeMines(index); startClock(); }
+        const cell = cells[index];
+        cell.revealed = true;
+        if (cell.mine) {
+          cell.hit = true;
+          finish(false);
+          return;
+        }
+        if (cell.count === 0) neighbors(index).forEach(next => { if (!cells[next].revealed && !cells[next].mine) reveal(next); });
+        checkWin();
+        draw();
+      }
+
+      function toggleFlag(index) {
+        if (ended || cells[index].revealed) return;
+        cells[index].flagged = !cells[index].flagged;
+        const remaining = levels[level].mines - cells.filter(cell => cell.flagged).length;
+        mineCountEl.textContent = String(remaining).padStart(3, '0');
+        draw();
+      }
+
+      function checkWin() {
+        if (cells.every(cell => cell.mine || cell.revealed)) finish(true);
+      }
+
+      function finish(won) {
+        ended = true;
+        clearInterval(timerId);
+        faceEl.textContent = won ? '😎' : '😵';
+        resultEl.textContent = won ? `漂亮！用时 ${seconds} 秒，成功通关。` : '踩到地雷了，再来一局吧。';
+        if (!won) cells.forEach(cell => { if (cell.mine) cell.revealed = true; });
+        draw();
+      }
+
+      document.querySelectorAll('[data-level]').forEach(button => button.addEventListener('click', () => {
+        level = button.dataset.level;
+        document.querySelectorAll('[data-level]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+        reset();
+      }));
+      document.querySelector('#restart').addEventListener('click', reset);
+      faceEl.addEventListener('click', reset);
+      modeEl.addEventListener('click', () => {
+        flagMode = !flagMode;
+        modeEl.classList.toggle('active', flagMode);
+        modeEl.setAttribute('aria-pressed', String(flagMode));
+        modeEl.lastElementChild.textContent = flagMode ? '插旗模式已开启' : '切换为插旗模式';
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key.toLowerCase() === 'r' && !event.ctrlKey && !event.altKey && !event.metaKey) reset();
+      });
+      reset();
+    })();
+  </script>
+</body>
+</html>
