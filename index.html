@@ -33,6 +33,9 @@
     .brand { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; }
     .brand-mark { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 8px; background: var(--green); color: white; font-size: 17px; }
     .on-air { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+    .header-actions { display: flex; align-items: center; gap: 14px; }
+    .language-button { min-width: 56px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; font-weight: 700; letter-spacing: .5px; }
+    .language-button:hover, .language-button:focus-visible { border-color: var(--green); color: var(--green); }
     .on-air i { width: 7px; height: 7px; border-radius: 50%; background: #cb5346; box-shadow: 0 0 0 3px #f7e5e2; }
     main { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 50px; align-items: start; padding-top: 34px; }
     .eyebrow { margin: 0 0 8px; color: var(--green); font-size: 12px; font-weight: 700; }
@@ -86,7 +89,7 @@
       .mode-button { display: flex; }
       .game-note { font-size: 10px; }
     }
-    @media (max-width: 380px) { .segments button { padding: 0 8px; } .rules { grid-template-columns: 1fr; } .on-air { display: none; } }
+    @media (max-width: 380px) { .segments button { padding: 0 8px; } .rules { grid-template-columns: 1fr; } .on-air { display: none; } .header-actions { gap: 0; } }
 
     /* LIN-2: a high-contrast broadcast-console skin for the game surface. */
     :root {
@@ -113,6 +116,7 @@
     .brand { color: var(--ink); letter-spacing: 1px; }
     .brand-mark { border: 1px solid var(--green); background: transparent; color: var(--green); box-shadow: 0 0 18px #50e3ff44; }
     .on-air { color: var(--muted); letter-spacing: 1px; }
+    .language-button { border-color: var(--line); }
     .on-air i { background: var(--red); box-shadow: 0 0 0 4px #ff6f9133, 0 0 12px var(--red); }
     .eyebrow { color: var(--green); letter-spacing: 2px; }
     .subtitle, .rules li, .counter span { color: var(--muted); }
@@ -143,44 +147,47 @@
   <div class="shell">
     <header class="topline">
       <div class="brand"><span class="brand-mark" aria-hidden="true">✳</span><span>今晚玩什么</span></div>
-      <div class="on-air"><i aria-hidden="true"></i>游戏节目 · 第 01 期</div>
+      <div class="header-actions">
+        <div class="on-air"><i aria-hidden="true"></i><span data-i18n="episode">游戏节目 · 第 01 期</span></div>
+        <button class="language-button" id="language" type="button" aria-label="切换至英文" title="切换至英文">EN</button>
+      </div>
     </header>
     <main>
       <section aria-labelledby="title">
-        <p class="eyebrow">MINESWEEPER / 扫雷现场</p>
-        <h1 id="title">避开地雷，清空棋盘</h1>
-        <p class="subtitle">每一格都藏着线索。保持冷静，找到所有安全区域。</p>
+        <p class="eyebrow" data-i18n="eyebrow">MINESWEEPER / 扫雷现场</p>
+        <h1 id="title" data-i18n="heading">避开地雷，清空棋盘</h1>
+        <p class="subtitle" data-i18n="subtitle">每一格都藏着线索。保持冷静，找到所有安全区域。</p>
         <div class="toolbar">
-          <div class="segments" role="group" aria-label="选择难度">
-            <button type="button" data-level="easy" aria-pressed="true">初级</button>
-            <button type="button" data-level="medium" aria-pressed="false">中级</button>
-            <button type="button" data-level="hard" aria-pressed="false">高级</button>
+          <div class="segments" role="group" aria-label="选择难度" data-i18n-aria="difficultyLabel">
+            <button type="button" data-level="easy" data-i18n="easy" aria-pressed="true">初级</button>
+            <button type="button" data-level="medium" data-i18n="medium" aria-pressed="false">中级</button>
+            <button type="button" data-level="hard" data-i18n="hard" aria-pressed="false">高级</button>
           </div>
           <button class="icon-button" id="restart" type="button" aria-label="重新开始" title="重新开始">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M19 12a7.5 7.5 0 1 1-2.2-5.3L20 12"/></svg>
           </button>
         </div>
         <div class="scorebar" aria-label="游戏状态">
-          <div class="counter"><strong id="mine-count">010</strong><span>剩余标记</span></div>
+          <div class="counter"><strong id="mine-count">010</strong><span data-i18n="flagsLeft">剩余标记</span></div>
           <button class="face" id="face" type="button" aria-label="重新开始" title="重新开始">🙂</button>
-          <div class="counter"><strong id="timer">000</strong><span>计时</span></div>
+          <div class="counter"><strong id="timer">000</strong><span data-i18n="timer">计时</span></div>
         </div>
         <div class="board-frame"><div class="board" id="board" role="grid" aria-label="扫雷棋盘"></div></div>
         <button class="mode-button" id="mode" type="button" aria-pressed="false"><span aria-hidden="true">⚑</span><span>切换为插旗模式</span></button>
         <div class="result" id="result" aria-live="polite"></div>
-        <div class="game-note"><span>左键翻开 · 右键插旗</span><span>第一次点击不会踩雷</span></div>
+        <div class="game-note"><span data-i18n="controls">左键翻开 · 右键插旗</span><span data-i18n="firstSafe">第一次点击不会踩雷</span></div>
       </section>
       <aside aria-label="游戏规则">
-        <h2 class="side-title">节目规则</h2>
+        <h2 class="side-title" data-i18n="rulesTitle">节目规则</h2>
         <ol class="rules">
-          <li><span class="rule-number">01</span><span>翻开方格，数字代表周围 8 格中的地雷数。</span></li>
-          <li><span class="rule-number">02</span><span>右键标记地雷；手机上可切换插旗模式。</span></li>
-          <li><span class="rule-number">03</span><span>找出所有安全格即可通关，不必标完地雷。</span></li>
-          <li><span class="rule-number">04</span><span>按 <span class="key">R</span> 随时重新开始，首击有保护。</span></li>
+          <li><span class="rule-number">01</span><span data-i18n="rule1">翻开方格，数字代表周围 8 格中的地雷数。</span></li>
+          <li><span class="rule-number">02</span><span data-i18n="rule2">右键标记地雷；手机上可切换插旗模式。</span></li>
+          <li><span class="rule-number">03</span><span data-i18n="rule3">找出所有安全格即可通关，不必标完地雷。</span></li>
+          <li><span class="rule-number">04</span><span data-i18n="rule4">按 R 随时重新开始，首击有保护。</span></li>
         </ol>
       </aside>
     </main>
-    <footer>今晚玩什么 · 轻松一局，认真推理</footer>
+    <footer data-i18n="footer">今晚玩什么 · 轻松一局，认真推理</footer>
   </div>
   <script>
     (() => {
@@ -189,6 +196,12 @@
         medium: { rows: 12, cols: 12, mines: 24 },
         hard: { rows: 16, cols: 16, mines: 50 }
       };
+      const messages = {
+        'zh-CN': { title: '扫雷现场 | 游戏节目', brand: '今晚玩什么', episode: '游戏节目 · 第 01 期', eyebrow: 'MINESWEEPER / 扫雷现场', heading: '避开地雷，清空棋盘', subtitle: '每一格都藏着线索。保持冷静，找到所有安全区域。', difficultyLabel: '选择难度', easy: '初级', medium: '中级', hard: '高级', restart: '重新开始', gameStatus: '游戏状态', flagsLeft: '剩余标记', timer: '计时', board: '扫雷棋盘', flagSwitch: '切换为插旗模式', flagOn: '插旗模式已开启', controls: '左键翻开 · 右键插旗', firstSafe: '第一次点击不会踩雷', rulesLabel: '游戏规则', rulesTitle: '节目规则', rule1: '翻开方格，数字代表周围 8 格中的地雷数。', rule2: '右键标记地雷；手机上可切换插旗模式。', rule3: '找出所有安全格即可通关，不必标完地雷。', rule4: '按 R 随时重新开始，首击有保护。', footer: '今晚玩什么 · 轻松一局，认真推理', languageLabel: '切换至英文', languageText: 'EN', won: seconds => `漂亮！用时 ${seconds} 秒，成功通关。`, lost: '踩到地雷了，再来一局吧。', cell: (cell) => `第 ${cell.row + 1} 行第 ${cell.col + 1} 列${cell.revealed ? (cell.mine ? '，地雷' : cell.count ? `，周围 ${cell.count} 个地雷` : '，空白') : cell.flagged ? '，已标记' : '，未翻开'}` },
+        en: { title: 'Minesweeper Live | Game Show', brand: 'What Are We Playing?', episode: 'GAME SHOW · EPISODE 01', eyebrow: 'MINESWEEPER / LIVE FIELD', heading: 'Dodge the mines. Clear the board.', subtitle: 'Every tile hides a clue. Stay calm and uncover every safe zone.', difficultyLabel: 'Choose difficulty', easy: 'Easy', medium: 'Medium', hard: 'Hard', restart: 'Restart game', gameStatus: 'Game status', flagsLeft: 'FLAGS LEFT', timer: 'TIME', board: 'Minesweeper board', flagSwitch: 'Switch to flag mode', flagOn: 'Flag mode enabled', controls: 'Left click to reveal · Right click to flag', firstSafe: 'Your first click is always safe', rulesLabel: 'Game rules', rulesTitle: 'SHOW RULES', rule1: 'Reveal a tile; its number shows the mines in the 8 surrounding tiles.', rule2: 'Right-click to flag a mine; on mobile, switch to flag mode.', rule3: 'Reveal every safe tile to win. You do not need to flag every mine.', rule4: 'Press R to restart at any time. Your first click is protected.', footer: 'What Are We Playing? · Think sharp, play easy', languageLabel: '切换至中文', languageText: '中文', won: seconds => `Brilliant! Board cleared in ${seconds} seconds.`, lost: 'You hit a mine. Give it another shot!', cell: (cell) => `Row ${cell.row + 1}, column ${cell.col + 1}${cell.revealed ? (cell.mine ? ', mine' : cell.count ? `, ${cell.count} surrounding mine${cell.count === 1 ? '' : 's'}` : ', empty') : cell.flagged ? ', flagged' : ', hidden'}` }
+      };
+      let language = localStorage.getItem('minesweeper-language') === 'en' ? 'en' : 'zh-CN';
+      const t = key => messages[language][key];
       const boardEl = document.querySelector('#board');
       const mineCountEl = document.querySelector('#mine-count');
       const timerEl = document.querySelector('#timer');
@@ -202,6 +215,25 @@
       let flagMode = false;
       let seconds = 0;
       let timerId = null;
+
+      function applyLanguage() {
+        document.documentElement.lang = language;
+        document.title = t('title');
+        document.querySelector('.brand > span:last-child').textContent = t('brand');
+        document.querySelectorAll('[data-i18n]').forEach(element => { element.textContent = t(element.dataset.i18n); });
+        document.querySelectorAll('[data-i18n-aria]').forEach(element => element.setAttribute('aria-label', t(element.dataset.i18nAria)));
+        const languageButton = document.querySelector('#language');
+        languageButton.textContent = t('languageText');
+        languageButton.setAttribute('aria-label', t('languageLabel'));
+        languageButton.title = t('languageLabel');
+        document.querySelectorAll('#restart, #face').forEach(element => { element.setAttribute('aria-label', t('restart')); element.title = t('restart'); });
+        document.querySelector('.scorebar').setAttribute('aria-label', t('gameStatus'));
+        boardEl.setAttribute('aria-label', t('board'));
+        document.querySelector('aside').setAttribute('aria-label', t('rulesLabel'));
+        modeEl.lastElementChild.textContent = flagMode ? t('flagOn') : t('flagSwitch');
+        if (ended) resultEl.textContent = faceEl.textContent === '😎' ? t('won')(seconds) : t('lost');
+        draw();
+      }
 
       function reset() {
         clearInterval(timerId);
@@ -219,7 +251,7 @@
         faceEl.textContent = '🙂';
         modeEl.classList.remove('active');
         modeEl.setAttribute('aria-pressed', 'false');
-        modeEl.lastElementChild.textContent = '切换为插旗模式';
+        modeEl.lastElementChild.textContent = t('flagSwitch');
         draw();
       }
 
@@ -234,7 +266,7 @@
           button.type = 'button';
           button.className = 'cell';
           button.setAttribute('role', 'gridcell');
-          button.setAttribute('aria-label', `第 ${cell.row + 1} 行第 ${cell.col + 1} 列${cell.revealed ? (cell.mine ? '，地雷' : cell.count ? `，周围 ${cell.count} 个地雷` : '，空白') : cell.flagged ? '，已标记' : '，未翻开'}`);
+          button.setAttribute('aria-label', t('cell')(cell));
           if (cell.flagged) { button.classList.add('flagged'); button.textContent = '⚑'; }
           if (cell.revealed) {
             button.classList.add('revealed');
@@ -312,7 +344,7 @@
         ended = true;
         clearInterval(timerId);
         faceEl.textContent = won ? '😎' : '😵';
-        resultEl.textContent = won ? `漂亮！用时 ${seconds} 秒，成功通关。` : '踩到地雷了，再来一局吧。';
+        resultEl.textContent = won ? t('won')(seconds) : t('lost');
         if (!won) cells.forEach(cell => { if (cell.mine) cell.revealed = true; });
         draw();
       }
@@ -328,12 +360,18 @@
         flagMode = !flagMode;
         modeEl.classList.toggle('active', flagMode);
         modeEl.setAttribute('aria-pressed', String(flagMode));
-        modeEl.lastElementChild.textContent = flagMode ? '插旗模式已开启' : '切换为插旗模式';
+        modeEl.lastElementChild.textContent = flagMode ? t('flagOn') : t('flagSwitch');
+      });
+      document.querySelector('#language').addEventListener('click', () => {
+        language = language === 'zh-CN' ? 'en' : 'zh-CN';
+        localStorage.setItem('minesweeper-language', language);
+        applyLanguage();
       });
       document.addEventListener('keydown', event => {
         if (event.key.toLowerCase() === 'r' && !event.ctrlKey && !event.altKey && !event.metaKey) reset();
       });
       reset();
+      applyLanguage();
     })();
   </script>
 </body>
